@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vaultline</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#121212;
+    --panel:#1C1C1E;
+    --line:#2E2E30;
+    --accent:#E8B75A;
+    --accent-dim:#8A6A2F;
+    --text:#F2F2F2;
+    --text-dim:#9A9A9C;
+    --text-faint:#6B6B6D;
+    --danger:#E5675F;
+    --success:#5FBF8F;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+
+  .wrap{width:100%; max-width:400px;}
+
+  .logo{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-bottom:36px;
+  }
+  .logo .mark{
+    width:56px; height:56px;
+    border-radius:16px;
+    border:2px solid var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:14px;
+    position:relative;
+  }
+  .logo .mark::after{
+    content:'';
+    width:8px; height:8px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+  .logo h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:0.3px;
+  }
+  .logo p{
+    font-size:12.5px;
+    color:var(--text-faint);
+    margin-top:4px;
+  }
+
+  .setup-box{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px; margin-bottom:20px;
+  }
+  .setup-box .label{font-size:12px; color:var(--text-dim); margin-bottom:8px;}
+  .setup-box input{
+    width:100%; background:var(--bg); border:1px solid var(--line); border-radius:24px;
+    padding:10px 16px; color:var(--text); font-size:13px; outline:none; margin-bottom:10px;
+  }
+  .setup-box input:focus{border-color:var(--accent-dim);}
+  .setup-box button{
+    width:100%; padding:10px 0; background:var(--accent); color:#211703; border:none;
+    border-radius:24px; font-weight:600; font-size:13px; cursor:pointer;
+  }
+  .setup-box .hint{font-size:11px; color:var(--text-faint); margin-top:8px; line-height:1.5;}
+
+  .connected-pill{
+    display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px;
+    color:var(--success); margin-bottom:20px;
+  }
+  .connected-pill .dot{width:6px; height:6px; border-radius:50%; background:var(--success);}
+
+  .hidden{display:none !important;}
+
+  .field{margin-bottom:14px;}
+  .field input{
+    width:100%; background:transparent; border:1px solid var(--line); border-radius:28px;
+    padding:15px 20px; color:var(--text); font-size:14.5px; outline:none; transition:border-color 0.15s;
+  }
+  .field input::placeholder{color:var(--text-faint);}
+  .field input:focus{border-color:var(--accent-dim);}
+  .field input.invalid{border-color:var(--danger);}
+  .field .err{color:var(--danger); font-size:12px; margin-top:6px; margin-left:20px; display:none;}
+  .field .err.show{display:block;}
+
+  .primary-btn{
+    width:100%; padding:15px 0; background:var(--accent); color:#211703; border:none;
+    border-radius:28px; font-family:'Inter',sans-serif; font-weight:600; font-size:15px;
+    cursor:pointer; margin-top:6px; transition:filter 0.15s, transform 0.05s;
+  }
+  .primary-btn:hover{filter:brightness(1.08);}
+  .primary-btn:active{transform:scale(0.99);}
+  .primary-btn:disabled{opacity:0.6; cursor:not-allowed;}
+
+  .ghost-btn{
+    width:100%; padding:14px 0; background:transparent; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:28px; font-weight:600;
+    font-size:14.5px; cursor:pointer; margin-top:14px;
+  }
+  .ghost-btn:hover{background:rgba(232,183,90,0.06);}
+
+  .link-row{text-align:center; margin-top:18px;}
+  .link-row a{
+    color:var(--text-dim); font-size:13px; text-decoration:none; cursor:pointer;
+  }
+  .link-row a:hover{color:var(--accent);}
+
+  .banner{
+    padding:11px 16px; border-radius:12px; font-size:12.5px; margin-bottom:16px; display:none; text-align:center;
+  }
+  .banner.show{display:block;}
+  .banner.err{background:rgba(229,103,95,0.1); border:1px solid rgba(229,103,95,0.3); color:#F0958F;}
+  .banner.ok{background:rgba(95,191,143,0.1); border:1px solid rgba(95,191,143,0.3); color:#8FD8AF;}
+
+  .view{display:none;}
+  .view.active{display:block; animation:fadeIn 0.2s ease;}
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
+
+  .view-title{
+    font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; margin-bottom:6px; text-align:center;
+  }
+  .view-sub{
+    font-size:13px; color:var(--text-dim); text-align:center; margin-bottom:26px;
+  }
+
+  #dashboard{display:none; text-align:center;}
+  #dashboard.active{display:block;}
+  .avatar{
+    width:64px; height:64px; border-radius:50%; background:var(--panel); border:1px solid var(--accent-dim);
+    display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif;
+    font-weight:600; color:var(--accent); font-size:22px; margin:0 auto 18px;
+  }
+  #dashboard .welcome{font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:600; margin-bottom:6px;}
+  #dashboard .welcome span{color:var(--accent);}
+  #dashboard .sub{color:var(--text-dim); font-size:13px; margin-bottom:24px;}
+  .meta-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:13px 16px;
+    margin-bottom:8px; text-align:left;
+  }
+  .meta-card .k{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:1px;}
+  .meta-card .v{font-size:13.5px; margin-top:3px;}
+  .logout-btn{
+    margin-top:18px; background:transparent; border:1px solid var(--line); color:var(--text-dim);
+    padding:13px 0; border-radius:28px; font-size:14px; cursor:pointer; width:100%;
+  }
+  .logout-btn:hover{border-color:var(--danger); color:#F0958F;}
+
+  .foot{
+    text-align:center; font-size:11px; color:var(--text-faint); margin-top:28px; line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="logo">
+    <div class="mark"></div>
+    <h1>Vaultline</h1>
+    <p>Apna account banayein ya login karein</p>
+  </div>
+
+  <div id="authArea">
+
+    <!-- LOGIN -->
+    <div id="viewLogin" class="view active">
+      <div id="loginBanner" class="banner"></div>
+      <div class="field">
+        <input type="text" id="loginUsername" placeholder="Username">
+        <div class="err" id="loginUsernameErr"></div>
+      </div>
+      <div class="field">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <div class="err" id="loginPasswordErr"></div>
+      </div>
+      <button class="primary-btn" id="loginBtn" onclick="handleLogin()">Log in</button>
+      <div class="link-row"><a onclick="showView('forgot')">Password bhool gaye?</a></div>
+      <button class="ghost-btn" onclick="showView('register')">Naya account banayein</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="viewRegister" class="view">
+      <div class="view-title">Account banayein</div>
+      <div class="view-sub">Apna data dijiye</div>
+      <div id="registerBanner" class="banner"></div>
+      <div class="field">
+        <input type="text" id="regName" placeholder="Poora naam">
+        <div class="err" id="regNameErr"></div>
+      </div>
+      <div class="field">
+        <input type="text" id="regUsername" placeholder="Username">
+        <div class="err" id="regUsernameErr"></div>
+      </div>
+      <div class="field">
+        <input type="email" id="regEmail" placeholder="Email">
+        <div class="err" id="regEmailErr"></div>
+      </div>
+      <div class="field">
+        <input type="password" id="regPassword" placeholder="Password (kam se kam 8 characters)">
+        <div class="err" id="regPasswordErr"></div>
+      </div>
+      <div class="field">
+        <input type="password" id="regConfirm" placeholder="Password dobara likhein">
+        <div class="err" id="regConfirmErr"></div>
+      </div>
+      <button class="primary-btn" id="registerBtn" onclick="handleRegister()">Register karein</button>
+      <div class="link-row"><a onclick="showView('login')">Pehle se account hai? Login karein</a></div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="viewForgot" class="view">
+      <div class="view-title">Password reset karein</div>
+      <div class="view-sub">Username daalein aur naya password set karein</div>
+      <div id="forgotBanner" class="banner"></div>
+      <div class="field">
+        <input type="text" id="forgotUsername" placeholder="Username">
+        <div class="err" id="forgotUsernameErr"></div>
+      </div>
+      <div class="field">
+        <input type="password" id="forgotNewPassword" placeholder="Naya password (kam se kam 8 characters)">
+        <div class="err" id="forgotNewPasswordErr"></div>
+      </div>
+      <div class="field">
+        <input type="password" id="forgotConfirmPassword" placeholder="Naya password dobara likhein">
+        <div class="err" id="forgotConfirmPasswordErr"></div>
+      </div>
+      <button class="primary-btn" id="forgotBtn" onclick="handleForgot()">Password set karein</button>
+      <div class="link-row"><a onclick="showView('login')">Login par wapas jaayein</a></div>
+    </div>
+
+    <div class="foot">Password kabhi bhi plain text me store nahi hota — sirf salted hash Sheet me jaata hai.</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="avatar" id="dashAvatar">?</div>
+    <div class="welcome" id="welcomeMsg">Welcome!</div>
+    <div class="sub">Aap safaltapoorvak login ho chuke hain.</div>
+    <div class="meta-card"><div class="k">Username</div><div class="v" id="dashUsername">—</div></div>
+    <div class="meta-card"><div class="k">Email</div><div class="v" id="dashEmail">—</div></div>
+    <div class="meta-card"><div class="k">Account created</div><div class="v" id="dashCreated">—</div></div>
+    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+  </div>
+
+</div>
+
+<script>
+// Yahan apna Apps Script deployment URL daalein (jo /exec par khatam hota hai)
+const SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+}
+
+function showBanner(id, msg, kind){
+  const b = document.getElementById(id);
+  b.textContent = msg;
+  b.className = 'banner show ' + kind;
+}
+function clearBanner(id){ document.getElementById(id).className = 'banner'; }
+function setFieldError(id, msg){
+  const errEl = document.getElementById(id+'Err');
+  const inputEl = document.getElementById(id.replace('Err',''));
+  if(msg){ errEl.textContent = msg; errEl.classList.add('show'); inputEl.classList.add('invalid'); }
+  else { errEl.classList.remove('show'); inputEl.classList.remove('invalid'); }
+}
+
+function bufToHex(buf){
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+async function sha256Hex(text){
+  const enc = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', enc);
+  return bufToHex(digest);
+}
+function randomSaltHex(){
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return bufToHex(arr.buffer);
+}
+async function hashPassword(password, salt){
+  return await sha256Hex(salt + ':' + password);
+}
+async function callBackend(payload){
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  return await res.json();
+}
+function isValidEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+async function handleRegister(){
+  clearBanner('registerBanner');
+  ['regNameErr','regUsernameErr','regEmailErr','regPasswordErr','regConfirmErr'].forEach(id=>{
+    document.getElementById(id).classList.remove('show');
+  });
+  ['regName','regUsername','regEmail','regPassword','regConfirm'].forEach(id=>{
+    document.getElementById(id).classList.remove('invalid');
+  });
+
+  const name = document.getElementById('regName').value.trim();
+  const username = document.getElementById('regUsername').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const confirm = document.getElementById('regConfirm').value;
+
+  let hasError = false;
+  if(name.length < 2){ setFieldError('regNameErr','Apna naam daalein.'); hasError = true; }
+  if(username.length < 3 || !/^[a-zA-Z0-9_]+$/.test(username)){
+    setFieldError('regUsernameErr','Kam se kam 3 characters, sirf letters/numbers/underscore.'); hasError = true;
+  }
+  if(!isValidEmail(email)){ setFieldError('regEmailErr','Valid email daalein.'); hasError = true; }
+  if(password.length < 8){ setFieldError('regPasswordErr','Kam se kam 8 characters ka ho.'); hasError = true; }
+  if(confirm !== password || confirm.length === 0){ setFieldError('regConfirmErr','Passwords match nahi kar rahe.'); hasError = true; }
+  if(hasError) return;
+
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = true; btn.textContent = 'Processing...';
+
+  try{
+    const salt = randomSaltHex();
+    const hash = await hashPassword(password, salt);
+    const result = await callBackend({ action:'register', name, username, email, salt, hash });
+
+    if(!result.success){
+      showBanner('registerBanner', result.error === 'username_taken' ? 'Ye username pehle se registered hai.' : 'Save nahi ho paya. Dobara try karein.', 'err');
+    } else {
+      showBanner('registerBanner','Account ban gaya! Ab login karein.','ok');
+      document.getElementById('regName').value='';
+      document.getElementById('regUsername').value='';
+      document.getElementById('regEmail').value='';
+      document.getElementById('regPassword').value='';
+      document.getElementById('regConfirm').value='';
+      setTimeout(()=>{ showView('login'); document.getElementById('loginUsername').value = username; }, 900);
+    }
+  }catch(e){
+    showBanner('registerBanner','Backend se connect nahi ho paya.','err');
+  }
+
+  btn.disabled = false; btn.textContent = 'Register karein';
+}
+
+async function handleLogin(){
+  clearBanner('loginBanner');
+  ['loginUsernameErr','loginPasswordErr'].forEach(id=>{ document.getElementById(id).classList.remove('show'); });
+  ['loginUsername','loginPassword'].forEach(id=>{ document.getElementById(id).classList.remove('invalid'); });
+
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  let hasError = false;
+  if(username.length === 0){ setFieldError('loginUsernameErr','Username daalein.'); hasError = true; }
+  if(password.length === 0){ setFieldError('loginPasswordErr','Password daalein.'); hasError = true; }
+  if(hasError) return;
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Verifying...';
+
+  try{
+    const saltRes = await callBackend({ action:'getSalt', username });
+    if(!saltRes.success){
+      showBanner('loginBanner','Ye username registered nahi hai.','err');
+      btn.disabled = false; btn.textContent = 'Log in';
+      return;
+    }
+    const hash = await hashPassword(password, saltRes.salt);
+    const loginRes = await callBackend({ action:'login', username, hash });
+
+    if(!loginRes.success){
+      showBanner('loginBanner','Galat password.','err');
+      btn.disabled = false; btn.textContent = 'Log in';
+      return;
+    }
+    enterDashboard(loginRes);
+  }catch(e){
+    showBanner('loginBanner','Backend se connect nahi ho paya.','err');
+  }
+
+  btn.disabled = false; btn.textContent = 'Log in';
+}
+
+async function handleForgot(){
+  clearBanner('forgotBanner');
+  ['forgotUsernameErr','forgotNewPasswordErr','forgotConfirmPasswordErr'].forEach(id=>{
+    document.getElementById(id).classList.remove('show');
+  });
+  ['forgotUsername','forgotNewPassword','forgotConfirmPassword'].forEach(id=>{
+    document.getElementById(id).classList.remove('invalid');
+  });
+
+  const username = document.getElementById('forgotUsername').value.trim();
+  const newPassword = document.getElementById('forgotNewPassword').value;
+  const confirmPassword = document.getElementById('forgotConfirmPassword').value;
+
+  let hasError = false;
+  if(username.length === 0){ setFieldError('forgotUsernameErr','Username daalein.'); hasError = true; }
+  if(newPassword.length < 8){ setFieldError('forgotNewPasswordErr','Kam se kam 8 characters ka ho.'); hasError = true; }
+  if(confirmPassword !== newPassword || confirmPassword.length === 0){ setFieldError('forgotConfirmPasswordErr','Passwords match nahi kar rahe.'); hasError = true; }
+  if(hasError) return;
+
+  const btn = document.getElementById('forgotBtn');
+  btn.disabled = true; btn.textContent = 'Processing...';
+
+  try{
+    const checkRes = await callBackend({ action:'checkUsername', username });
+    if(!checkRes.success){
+      showBanner('forgotBanner','Ye username registered nahi hai.','err');
+      btn.disabled = false; btn.textContent = 'Password set karein';
+      return;
+    }
+
+    const salt = randomSaltHex();
+    const hash = await hashPassword(newPassword, salt);
+    const resetRes = await callBackend({ action:'resetPassword', username, salt, hash });
+
+    if(!resetRes.success){
+      showBanner('forgotBanner','Reset nahi ho paya. Dobara try karein.','err');
+    } else {
+      showBanner('forgotBanner','Password badal gaya! Ab login karein.','ok');
+      document.getElementById('forgotNewPassword').value='';
+      document.getElementById('forgotConfirmPassword').value='';
+      setTimeout(()=>{ showView('login'); document.getElementById('loginUsername').value = username; }, 900);
+    }
+  }catch(e){
+    showBanner('forgotBanner','Backend se connect nahi ho paya.','err');
+  }
+
+  btn.disabled = false; btn.textContent = 'Password set karein';
+}
+
+function enterDashboard(profile){
+  document.getElementById('authArea').classList.add('hidden');
+  document.getElementById('dashboard').classList.add('active');
+
+  document.getElementById('dashAvatar').textContent = profile.name.charAt(0).toUpperCase();
+  document.getElementById('welcomeMsg').innerHTML = 'Welcome, <span>'+profile.name+'</span>!';
+  document.getElementById('dashUsername').textContent = profile.username;
+  document.getElementById('dashEmail').textContent = profile.email;
+  document.getElementById('dashCreated').textContent = new Date(profile.createdAt).toLocaleString('hi-IN');
+}
+
+function handleLogout(){
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('authArea').classList.remove('hidden');
+  document.getElementById('loginPassword').value = '';
+  showView('login');
+}
+</script>
+
+</body>
+</html>
