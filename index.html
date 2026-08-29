@@ -355,7 +355,7 @@ async function handleRegister(){
       setTimeout(()=>{ showView('login'); document.getElementById('loginUsername').value = username; }, 900);
     }
   }catch(e){
-    showBanner('registerBanner','Backend se connect nahi ho paya.','err');
+    showBanner('registerBanner','Backend se connect nahi jo paya.','err');
   }
 
   btn.disabled = false; btn.textContent = 'Register karein';
